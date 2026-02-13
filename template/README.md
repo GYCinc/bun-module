@@ -4,48 +4,13 @@
 
 > A Bun module created from the [bun-module](https://github.com/zenobi-us/bun-module) template
 
-## Features
+## Usage
 
-- 🏗️ TypeScript-based module architecture
-- 🔧 Mise task runner integration
-- 📦 Bun/npm build tooling
-- ✨ ESLint + Prettier formatting
-- 🧪 Vitest testing setup
-- 🚀 GitHub Actions CI/CD
-- 📝 Release automation with release-please
+<!-- Example usage code goes here -->
 
-## Getting Started
+## Installation
 
-1. **Clone this template:**
-
-   ```bash
-   cp -r bun-module your-module-name
-   cd your-module-name
-   ```
-
-2. **Update package.json:**
-   - Change `name` to your module name
-   - Update `description`
-   - Update `repository.url`
-
-3. **Install dependencies:**
-
-   ```bash
-   bun install
-   ```
-
-4. **Implement your module in `src/index.ts`:**
-
-   ```typescript
-   export function hello(name: string): string {
-     return `Hello, ${name}!`;
-   }
-   ```
-
-5. **Test your module:**
-   ```bash
-   mise run test
-   ```
+<!-- Installation instructions go here -->
 
 ## Development
 
@@ -55,13 +20,9 @@
 - `mise run lint:fix` - Fix linting issues
 - `mise run format` - Format code with Prettier
 
-## Author
+## Release
 
-{{authorName}} <{{authorEmail}}>
-
-## Repository
-
-{{repositoryUrl}}
+See the [RELEASE.md](RELEASE.md) file for instructions on how to release a new version of the module.
 
 ## Contributing
 
@@ -69,4 +30,4 @@ Contributions are welcome! Please file issues or submit pull requests on the Git
 
 ## License
 
-MIT License. See the [LICENSE](LICENSE) file for details.
+See the [LICENSE](LICENSE) file for details.

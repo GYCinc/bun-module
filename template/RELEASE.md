@@ -1,9 +1,50 @@
 # Release Process
 
-This project uses Release Please for automated releases.
+This project uses Release Please and Npm Trusted Publishing for automated releases.
 
-> [!WARN]
-> Before doing anything, ensure that you've setup [Trusted Publishing](#npm-trusted-publishing).
+It follows two release channels:
+
+- **Pre-release**: Normal PRs merged to main create `x.x.x-next.J` versions published to the `next` npm dist-tag for testing and feedback.
+- **Stable Releases**: Release PRs merged to main create computed version and publish to the `latest` npm dist-tag.
+
+You can also trigger manual releases in the follow ways: 
+
+- Push a tag in the format `v{semver}` (e.g. `v1.2.3`)
+- Run the `publish.yml` workflow manually from the GitHub Actions tab and supply a channel 'latest' or 'next'.
+
+
+## First Release
+
+Before automated releases will work, you need to perform the first release manually. 
+
+Why: 
+
+- This uses [Npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers).
+- The first release creates the npm package on npmjs.com.
+- This then allows you to setup trusted publishing with GitHub Actions for future releases.
+
+### Steps
+
+1. make sure the `package.json` is correct: 
+  - is the version `0.0.1` ? 
+  - is the pkg name correct? Did you forget to set the scope if needed?
+  - do you have the right keywords? 
+  - do you have the right repository field?
+  - do you have the right author field?
+
+2. run `npm login` to authenticate with npm. 
+
+3. run `mise build` to build the module.
+
+4. run `mise publish --otp {your-2fa-code}` to publish the first version.
+
+5. Go to your npm package settings on npmjs.com and add a trusted publisher for GitHub Actions with:
+   - **Organization or user**: Your GitHub username/org
+   - **Repository**: Your repository name
+   - **Workflow filename**: `publish.yml` (the release workflow filename)
+
+6. [Restrict token access](https://docs.npmjs.com/trusted-publishers#recommended-restrict-token-access-when-using-trusted-publishers) for maximum security.
+
 
 ## Release Workflow
 
