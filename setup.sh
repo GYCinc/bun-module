@@ -173,6 +173,58 @@ apply_template() {
 }
 
 # ============================================================================
+# GitHub Repository Settings
+# ============================================================================
+
+configure_repo_settings() {
+	local repo_path="$1" # e.g., "zenobi-us/my-new-module"
+
+	info "Configuring repository settings via GitHub CLI"
+
+	if ! command -v gh &>/dev/null; then
+		warn "GitHub CLI (gh) not installed - skipping repo configuration"
+		return 0
+	fi
+
+	if ! gh auth status &>/dev/null; then
+		warn "GitHub CLI not authenticated - skipping repo configuration"
+		return 0
+	fi
+
+	# Configure merge settings (squash only)
+	# Configure branch settings (delete on merge)
+	# Disable wiki and projects
+	if gh repo edit "$repo_path" \
+		--delete-branch-on-merge \
+		--enable-squash-merge \
+		--enable-merge-commit=false \
+		--enable-rebase-merge=false \
+		--enable-issues \
+		--enable-wiki=false \
+		--enable-projects=false \
+		2>/dev/null; then
+		success "Repository settings configured"
+	else
+		warn "Could not configure repo settings (repo may not exist on GitHub yet)"
+		echo "   Run manually: gh repo edit $repo_path --delete-branch-on-merge --enable-squash-merge --enable-merge-commit=false --enable-rebase-merge=false --enable-wiki=false --enable-projects=false"
+		return 0
+	fi
+
+	# Configure squash merge commit message format (not available via gh repo edit)
+	# PR_TITLE = use pull request title as commit title
+	# PR_BODY = use pull request description as commit body
+	if gh api "repos/$repo_path" \
+		--method PATCH \
+		--field squash_merge_commit_title=PR_TITLE \
+		--field squash_merge_commit_message=PR_BODY \
+		>/dev/null 2>&1; then
+		success "Squash merge commit format configured (PR title + description)"
+	else
+		warn "Could not configure squash merge commit format"
+	fi
+}
+
+# ============================================================================
 # Git Operations
 # ============================================================================
 
@@ -225,6 +277,13 @@ init_git_repo() {
 	# Try to push (may fail if repo doesn't exist)
 	if git -C "$project_dir" push -u origin main >/dev/null 2>&1; then
 		success "Pushed to remote"
+
+		# Extract owner/repo from repository URL for gh commands
+		local repo_path
+		repo_path=$(echo "$repository_url" | sed -E 's|.*github\.com[:/]([^/]+/[^/.]+)(\.git)?$|\1|')
+		if [[ -n "$repo_path" && "$repo_path" != "$repository_url" ]]; then
+			configure_repo_settings "$repo_path"
+		fi
 	else
 		warn "Could not push to remote (repository may not exist yet)"
 		echo "   Run this manually when ready: git push -u origin main"
