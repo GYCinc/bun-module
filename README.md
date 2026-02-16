@@ -2,7 +2,20 @@
 
 Generate a new Bun module in seconds!
 
-This is a generator repository for creating new Bun modules. It provides a starter template with all the scaffolding you need to build and publish Bun modules.
+## Why use this? 
+
+This repo provides a starter template with all the scaffolding you need to build and publish Bun modules.
+
+You get: 
+
+- A setup script to fill in the blanks and start with a clean git history.
+- Typescript setup curtesy of Bun. (yes you can still publish pkgs for non bun users)
+- Scalable tooling management with [`mise`](http://mise.jdx.dev)
+- Great automated release management with [release-please](https://github.com/googleapis/release-please-action)
+  - two release channels: 
+    - **pre-release** (`.next`) builds for all pr merges to main, and 
+    - **stable releases** for merged release PRs.
+- NPM Trusted Publishing workflow (but you have to manually deploy firs version to set up trusted publishing)
 
 ## Quick Start
 
