@@ -11,7 +11,8 @@ import (
 type ViewState int
 
 const (
-	StateSetup ViewState = iota
+	StateMainMenu ViewState = iota
+	StateWizard
 	StateTree
 	StateEditAgent
 	StateRunning
@@ -57,6 +58,10 @@ var (
 			Border(lipgloss.RoundedBorder()).
 			BorderForeground(lipgloss.Color("#874BFD")).
 			Padding(1, 2)
+
+	wizardDoneStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#43BF6D")).
+			MarginBottom(1)
 )
 
 func createTextArea(placeholder string) textarea.Model {

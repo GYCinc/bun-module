@@ -18,16 +18,16 @@ type SynthCompleteMsg struct {
 	Result string
 }
 
-func runAgent(spec SubAgentSpec, task string, index int) tea.Cmd {
+func runAgent(spec AgentConfig, task string, index int) tea.Cmd {
 	return func() tea.Msg {
 		res := MockExecuteSubagent(spec, task, 2*time.Second)
 		return AgentCompleteMsg{Index: index, Result: res}
 	}
 }
 
-func runSynth(task string, results []AgentResult) tea.Cmd {
+func runSynth(orch AgentConfig, task string, results []AgentResult) tea.Cmd {
 	return func() tea.Msg {
-		res := MockSynthesize(task, results, 3*time.Second)
+		res := MockSynthesize(orch, task, results, 3*time.Second)
 		return SynthCompleteMsg{Result: res}
 	}
 }
@@ -71,7 +71,7 @@ func (m *MainModel) updateRunning(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if allDone {
 			m.synthesizing = true
 			m.synthSpinner = createSpinner()
-			return m, tea.Batch(m.synthSpinner.Tick, runSynth(m.taskInput.Value(), m.results))
+			return m, tea.Batch(m.synthSpinner.Tick, runSynth(m.swarm.Orchestrator, m.swarm.MainTask, m.results))
 		}
 
 		return m, nil
@@ -95,7 +95,7 @@ func (m MainModel) viewRunning() string {
 		b.WriteString(subTitleStyle.Render("Sub-Agents Working in Parallel:"))
 		b.WriteString("\n\n")
 
-		for i, spec := range m.specs {
+		for i, spec := range m.swarm.SubAgents {
 			if m.completed[i] {
 				b.WriteString(fmt.Sprintf("%s [%s] %s: Done ✓\n", treeLineStyle.Render("├──"), spec.ID, spec.Name))
 			} else {
@@ -121,7 +121,7 @@ func (m *MainModel) updateResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		case tea.KeyBackspace, tea.KeyType('b'):
-			m.state = StateSetup
+			m.state = StateTree
 		}
 	}
 	return m, nil
@@ -142,7 +142,7 @@ func (m MainModel) viewResults() string {
 	}
 
 	b.WriteString("\n")
-	b.WriteString(helpStyle.Render("b: back to start • esc: quit"))
+	b.WriteString(helpStyle.Render("b: back to evaluation tree • esc: quit"))
 
 	return boxStyle.Render(b.String())
 }
